@@ -30,7 +30,7 @@ Agollo - Go Client for Apollo
 ### 导入 agollo
 
 ```
-go get -u github.com/apolloconfig/agollo/v4@latest
+go get -u github.com/agollo/agollo/v4@latest
 ```
 
 ### 启动 agollo
@@ -40,8 +40,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/apolloconfig/agollo/v4"
-	"github.com/apolloconfig/agollo/v4/env/config"
+	"github.com/agollo/agollo/v4"
+	"github.com/agollo/agollo/v4/env/config"
 )
 
 func main() {
@@ -52,6 +52,9 @@ func main() {
 		NamespaceName:  "dubbo",
 		IsBackupConfig: true,
 		Secret:         "6ce3ff7e96a24335a9634fe9abca6d51",
+		Header : map[string]string{
+		   "Host":"abc.com"
+		}
 	}
 
 	agollo.SetLogger(&DefaultLogger{})

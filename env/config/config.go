@@ -24,7 +24,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/apolloconfig/agollo/v4/utils"
+	"github.com/agollo/agollo/v4/utils"
 )
 
 var (
@@ -41,14 +41,15 @@ type File interface {
 
 //AppConfig 配置文件
 type AppConfig struct {
-	AppID             string `json:"appId"`
-	Cluster           string `json:"cluster"`
-	NamespaceName     string `json:"namespaceName"`
-	IP                string `json:"ip"`
-	IsBackupConfig    bool   `default:"true" json:"isBackupConfig"`
-	BackupConfigPath  string `json:"backupConfigPath"`
-	Secret            string `json:"secret"`
-	SyncServerTimeout int    `json:"syncServerTimeout"`
+	AppID             string            `json:"appId"`
+	Cluster           string            `json:"cluster"`
+	NamespaceName     string            `json:"namespaceName"`
+	IP                string            `json:"ip"`
+	Header            map[string]string `json:"header"`
+	IsBackupConfig    bool              `default:"true" json:"isBackupConfig"`
+	BackupConfigPath  string            `json:"backupConfigPath"`
+	Secret            string            `json:"secret"`
+	SyncServerTimeout int               `json:"syncServerTimeout"`
 	// MustStart 可用于控制第一次同步必须成功
 	MustStart               bool `default:"false"`
 	notificationsMap        *notificationsMap
@@ -85,6 +86,13 @@ func (a *AppConfig) GetHost() string {
 		return u.String() + "/"
 	}
 	return u.String()
+}
+
+//GetHeader
+// @receiver a
+// @return map[string]string
+func (a *AppConfig) GetHeader() map[string]string {
+	return a.Header
 }
 
 // Init 初始化notificationsMap

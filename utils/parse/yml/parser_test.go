@@ -18,8 +18,8 @@
 package yml
 
 import (
-	"github.com/apolloconfig/agollo/v4/utils"
-	"github.com/apolloconfig/agollo/v4/utils/parse"
+	"github.com/agollo/agollo/v4/utils"
+	"github.com/agollo/agollo/v4/utils/parse"
 	"testing"
 
 	. "github.com/tevid/gohamcrest"

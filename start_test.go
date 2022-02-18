@@ -24,12 +24,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/apolloconfig/agollo/v4/agcache/memory"
-	"github.com/apolloconfig/agollo/v4/component/log"
-	"github.com/apolloconfig/agollo/v4/env"
-	"github.com/apolloconfig/agollo/v4/env/config"
-	jsonFile "github.com/apolloconfig/agollo/v4/env/config/json"
-	"github.com/apolloconfig/agollo/v4/extension"
+	"github.com/agollo/agollo/v4/agcache/memory"
+	"github.com/agollo/agollo/v4/component/log"
+	"github.com/agollo/agollo/v4/env"
+	"github.com/agollo/agollo/v4/env/config"
+	jsonFile "github.com/agollo/agollo/v4/env/config/json"
+	"github.com/agollo/agollo/v4/extension"
 	. "github.com/tevid/gohamcrest"
 )
 

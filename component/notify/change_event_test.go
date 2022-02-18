@@ -24,16 +24,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/apolloconfig/agollo/v4/agcache/memory"
-	"github.com/apolloconfig/agollo/v4/cluster/roundrobin"
-	"github.com/apolloconfig/agollo/v4/component/remote"
-	"github.com/apolloconfig/agollo/v4/env/config"
-	jsonFile "github.com/apolloconfig/agollo/v4/env/file/json"
-	"github.com/apolloconfig/agollo/v4/extension"
+	"github.com/agollo/agollo/v4/agcache/memory"
+	"github.com/agollo/agollo/v4/cluster/roundrobin"
+	"github.com/agollo/agollo/v4/component/remote"
+	"github.com/agollo/agollo/v4/env/config"
+	jsonFile "github.com/agollo/agollo/v4/env/file/json"
+	"github.com/agollo/agollo/v4/extension"
 
-	_ "github.com/apolloconfig/agollo/v4/agcache/memory"
-	_ "github.com/apolloconfig/agollo/v4/env/file/json"
-	"github.com/apolloconfig/agollo/v4/storage"
+	_ "github.com/agollo/agollo/v4/agcache/memory"
+	_ "github.com/agollo/agollo/v4/env/file/json"
+	"github.com/agollo/agollo/v4/storage"
 	. "github.com/tevid/gohamcrest"
 )
 

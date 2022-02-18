@@ -21,12 +21,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/apolloconfig/agollo/v4/env/config"
+	"github.com/agollo/agollo/v4/env/config"
 	"os"
 	"sync"
 
-	"github.com/apolloconfig/agollo/v4/component/log"
-	jsonConfig "github.com/apolloconfig/agollo/v4/env/config/json"
+	"github.com/agollo/agollo/v4/component/log"
+	jsonConfig "github.com/agollo/agollo/v4/env/config/json"
 )
 
 //Suffix 默认文件保存类型

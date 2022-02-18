@@ -29,13 +29,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/apolloconfig/agollo/v4/env/server"
+	"github.com/agollo/agollo/v4/env/server"
 
-	"github.com/apolloconfig/agollo/v4/component/log"
-	"github.com/apolloconfig/agollo/v4/env"
-	"github.com/apolloconfig/agollo/v4/env/config"
-	"github.com/apolloconfig/agollo/v4/extension"
-	"github.com/apolloconfig/agollo/v4/utils"
+	"github.com/agollo/agollo/v4/component/log"
+	"github.com/agollo/agollo/v4/env"
+	"github.com/agollo/agollo/v4/env/config"
+	"github.com/agollo/agollo/v4/extension"
+	"github.com/agollo/agollo/v4/utils"
 )
 
 var (
@@ -90,7 +90,7 @@ type CallBack struct {
 }
 
 //Request 建立网络请求
-func Request(requestURL string, connectionConfig *env.ConnectConfig, callBack *CallBack) (interface{}, error) {
+func Request(requestURL string, headers map[string]string, connectionConfig *env.ConnectConfig, callBack *CallBack) (interface{}, error) {
 	client := &http.Client{}
 	//如有设置自定义超时时间即使用
 	if connectionConfig != nil && connectionConfig.Timeout != 0 {
@@ -114,6 +114,12 @@ func Request(requestURL string, connectionConfig *env.ConnectConfig, callBack *C
 	if connectionConfig != nil && !connectionConfig.IsRetry {
 		retries = 1
 	}
+	var res *http.Response
+	defer func() {
+		if res != nil {
+			res.Body.Close()
+		}
+	}()
 	for {
 
 		retry++
@@ -127,7 +133,6 @@ func Request(requestURL string, connectionConfig *env.ConnectConfig, callBack *C
 			// if error then sleep
 			return nil, errors.New("generate connect Apollo request fail")
 		}
-
 		//增加header选项
 		httpAuth := extension.GetHTTPAuth()
 		if httpAuth != nil {
@@ -136,12 +141,15 @@ func Request(requestURL string, connectionConfig *env.ConnectConfig, callBack *C
 				req.Header = headers
 			}
 		}
-
-		res, err := client.Do(req)
-		if res != nil {
-			defer res.Body.Close()
+		//设置自定义header
+		for k, v := range headers {
+			if strings.ToLower(k) == "host" {
+				req.Host = v
+				continue
+			}
+			req.Header.Add(k, v)
 		}
-
+		res, err := client.Do(req)
 		if res == nil || err != nil {
 			log.Errorf("Connect Apollo Server Fail,url:%s,Error:%s", requestURL, err)
 			// if error then sleep
@@ -200,7 +208,7 @@ func RequestRecovery(appConfig config.AppConfig,
 		}
 
 		requestURL := fmt.Sprintf(format, host, connectConfig.URI)
-		response, err = Request(requestURL, connectConfig, callBack)
+		response, err = Request(requestURL, appConfig.GetHeader(), connectConfig, callBack)
 		if err == nil {
 			return response, nil
 		}
