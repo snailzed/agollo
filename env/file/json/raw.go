@@ -19,12 +19,12 @@ package json
 
 import (
 	"fmt"
-	"github.com/agollo/agollo/v4/component/log"
-	"github.com/agollo/agollo/v4/env/config"
+	"github.com/snailzed/agollo/v4/component/log"
+	"github.com/snailzed/agollo/v4/env/config"
 	"os"
 	"sync"
 
-	"github.com/agollo/agollo/v4/env/file"
+	"github.com/snailzed/agollo/v4/env/file"
 )
 
 var (

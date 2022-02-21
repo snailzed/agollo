@@ -18,7 +18,7 @@
 package extension
 
 import (
-	"github.com/agollo/agollo/v4/protocol/auth"
+	"github.com/snailzed/agollo/v4/protocol/auth"
 )
 
 var authSign auth.HTTPAuth

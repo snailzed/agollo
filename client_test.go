@@ -25,13 +25,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/agollo/agollo/v4/agcache/memory"
-	"github.com/agollo/agollo/v4/env/config"
-	"github.com/agollo/agollo/v4/env/server"
+	"github.com/snailzed/agollo/v4/agcache/memory"
+	"github.com/snailzed/agollo/v4/env/config"
+	"github.com/snailzed/agollo/v4/env/server"
 
-	_ "github.com/agollo/agollo/v4/env/file/json"
-	"github.com/agollo/agollo/v4/extension"
-	"github.com/agollo/agollo/v4/storage"
+	_ "github.com/snailzed/agollo/v4/env/file/json"
+	"github.com/snailzed/agollo/v4/extension"
+	"github.com/snailzed/agollo/v4/storage"
 	. "github.com/tevid/gohamcrest"
 )
 

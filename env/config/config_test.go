@@ -22,7 +22,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/agollo/agollo/v4/utils"
+	"github.com/snailzed/agollo/v4/utils"
 	. "github.com/tevid/gohamcrest"
 )
 

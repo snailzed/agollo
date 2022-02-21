@@ -18,8 +18,8 @@
 package remote
 
 import (
-	"github.com/agollo/agollo/v4/env/config"
-	"github.com/agollo/agollo/v4/protocol/http"
+	"github.com/snailzed/agollo/v4/env/config"
+	"github.com/snailzed/agollo/v4/protocol/http"
 )
 
 // ApolloConfig apollo 配置

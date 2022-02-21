@@ -25,13 +25,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/agollo/agollo/v4/cluster/roundrobin"
-	"github.com/agollo/agollo/v4/env"
-	"github.com/agollo/agollo/v4/env/config"
-	jsonFile "github.com/agollo/agollo/v4/env/file/json"
-	"github.com/agollo/agollo/v4/env/server"
-	"github.com/agollo/agollo/v4/extension"
-	http2 "github.com/agollo/agollo/v4/protocol/http"
+	"github.com/snailzed/agollo/v4/cluster/roundrobin"
+	"github.com/snailzed/agollo/v4/env"
+	"github.com/snailzed/agollo/v4/env/config"
+	jsonFile "github.com/snailzed/agollo/v4/env/file/json"
+	"github.com/snailzed/agollo/v4/env/server"
+	"github.com/snailzed/agollo/v4/extension"
+	http2 "github.com/snailzed/agollo/v4/protocol/http"
 	. "github.com/tevid/gohamcrest"
 )
 

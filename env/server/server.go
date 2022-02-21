@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/agollo/agollo/v4/env/config"
+	"github.com/snailzed/agollo/v4/env/config"
 )
 
 // ip -> server

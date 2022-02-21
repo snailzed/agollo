@@ -18,8 +18,8 @@
 package yaml
 
 import (
-	"github.com/agollo/agollo/v4/utils"
-	"github.com/agollo/agollo/v4/utils/parse"
+	"github.com/snailzed/agollo/v4/utils"
+	"github.com/snailzed/agollo/v4/utils/parse"
 	"testing"
 
 	. "github.com/tevid/gohamcrest"

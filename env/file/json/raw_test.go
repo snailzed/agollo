@@ -21,7 +21,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/agollo/agollo/v4/extension"
+	"github.com/snailzed/agollo/v4/extension"
 	. "github.com/tevid/gohamcrest"
 )
 

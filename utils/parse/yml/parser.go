@@ -19,7 +19,7 @@ package yml
 
 import (
 	"bytes"
-	"github.com/agollo/agollo/v4/utils"
+	"github.com/snailzed/agollo/v4/utils"
 	"github.com/spf13/viper"
 )
 

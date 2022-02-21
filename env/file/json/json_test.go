@@ -19,12 +19,12 @@ package json
 
 import (
 	"encoding/json"
-	"github.com/agollo/agollo/v4/env/config"
-	"github.com/agollo/agollo/v4/utils"
+	"github.com/snailzed/agollo/v4/env/config"
+	"github.com/snailzed/agollo/v4/utils"
 	"os"
 	"testing"
 
-	"github.com/agollo/agollo/v4/extension"
+	"github.com/snailzed/agollo/v4/extension"
 	. "github.com/tevid/gohamcrest"
 )
 

@@ -20,11 +20,11 @@ package serverlist
 import (
 	"testing"
 
-	"github.com/agollo/agollo/v4/env/server"
-	"github.com/agollo/agollo/v4/protocol/http"
+	"github.com/snailzed/agollo/v4/env/server"
+	"github.com/snailzed/agollo/v4/protocol/http"
 
-	"github.com/agollo/agollo/v4/env"
-	"github.com/agollo/agollo/v4/env/config"
+	"github.com/snailzed/agollo/v4/env"
+	"github.com/snailzed/agollo/v4/env/config"
 	. "github.com/tevid/gohamcrest"
 )
 

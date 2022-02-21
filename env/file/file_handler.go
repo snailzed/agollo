@@ -18,7 +18,7 @@
 package file
 
 import (
-	"github.com/agollo/agollo/v4/env/config"
+	"github.com/snailzed/agollo/v4/env/config"
 )
 
 //FileHandler 备份文件读写

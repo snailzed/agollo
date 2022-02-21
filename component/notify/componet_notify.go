@@ -20,10 +20,10 @@ package notify
 import (
 	"time"
 
-	"github.com/agollo/agollo/v4/component/remote"
-	"github.com/agollo/agollo/v4/storage"
+	"github.com/snailzed/agollo/v4/component/remote"
+	"github.com/snailzed/agollo/v4/storage"
 
-	"github.com/agollo/agollo/v4/env/config"
+	"github.com/snailzed/agollo/v4/env/config"
 )
 
 const (

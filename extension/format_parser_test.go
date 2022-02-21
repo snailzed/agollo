@@ -20,7 +20,7 @@ package extension
 import (
 	"testing"
 
-	"github.com/agollo/agollo/v4/constant"
+	"github.com/snailzed/agollo/v4/constant"
 
 	. "github.com/tevid/gohamcrest"
 )

@@ -30,7 +30,7 @@ Agollo - Go Client for Apollo
 ### 导入 agollo
 
 ```
-go get -u github.com/agollo/agollo/v4@latest
+go get -u github.com/snailzed/agollo/v4@latest
 ```
 
 ### 启动 agollo
@@ -40,8 +40,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/agollo/agollo/v4"
-	"github.com/agollo/agollo/v4/env/config"
+	"github.com/snailzed/agollo/v4"
+	"github.com/snailzed/agollo/v4/env/config"
 )
 
 func main() {
