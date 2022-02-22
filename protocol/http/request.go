@@ -185,8 +185,6 @@ func Request(requestURL string, headers map[string]string, connectionConfig *env
 			continue
 		}
 	}
-
-	log.Error("Over Max Retry Still Error,Error:", err)
 	if retry > retries {
 		err = errors.New("over Max Retry Still Error")
 	}
