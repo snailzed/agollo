@@ -101,7 +101,7 @@ func Request(requestURL string, headers map[string]string, connectionConfig *env
 	var err error
 	url, err := url2.Parse(requestURL)
 	if err != nil {
-		log.Error("request Apollo Server url:%s, is invalid %s", requestURL, err)
+		log.Errorf("request Apollo Server url:%s, is invalid %s", requestURL, err)
 		return nil, err
 	}
 	var insecureSkipVerify bool
@@ -162,7 +162,7 @@ func Request(requestURL string, headers map[string]string, connectionConfig *env
 		case http.StatusOK:
 			responseBody, err := ioutil.ReadAll(res.Body)
 			if err != nil {
-				log.Errorf("Connect Apollo Server Fail,url:%s,Error:", requestURL, err)
+				log.Errorf("Connect Apollo Server Fail,url:%s,Error:%s", requestURL, err)
 				// if error then sleep
 				time.Sleep(onErrorRetryInterval)
 				continue
