@@ -61,8 +61,8 @@ func (a *AbsApolloConfig) SyncWithNamespace(namespace string, appConfigFunc func
 		return nil
 	}
 
+	//可能是配置未修改 304 NOT MODIFY
 	if apolloConfig == nil {
-		log.Warn("apolloConfig is nil")
 		return nil
 	}
 
