@@ -20,7 +20,9 @@ package storage
 import (
 	"container/list"
 	"fmt"
+	"github.com/goccy/go-json"
 	"reflect"
+	"strconv"
 	"sync"
 	"sync/atomic"
 
@@ -146,7 +148,7 @@ func (c *Config) GetValueImmediately(key string) string {
 
 	v, ok := value.(string)
 	if !ok {
-		log.Debug("convert to string fail ! source type:%T", value)
+		log.Debugf("convert to string fail ! source type:%T", value)
 		return utils.Empty
 	}
 	return v
@@ -163,48 +165,69 @@ func (c *Config) GetStringValueImmediately(key string, defaultValue string) stri
 }
 
 // GetStringSliceValueImmediately 获取配置值（[]string），立即返回，初始化未完成直接返回错误
-func (c *Config) GetStringSliceValueImmediately(key string, defaultValue []string) []string {
+func (c *Config) GetStringSliceValueImmediately(key string, defaultValue []string) (v []string) {
 	value := c.getConfigValue(key, false)
 	if value == nil {
 		return defaultValue
 	}
 
-	v, ok := value.([]string)
-	if !ok {
-		log.Debug("convert to []string fail ! source type:%T", value)
-		return defaultValue
+	switch value.(type) {
+	case []string:
+		return value.([]string)
+	case string:
+		err := json.Unmarshal([]byte(value.(string)), &v)
+		if err != nil {
+			log.Debugf("Unmarshal to []string fail ! source type:%T", value)
+			return defaultValue
+		}
+		return v
 	}
-	return v
+	log.Debugf("convert to []string fail ! source type:%T", value)
+	return defaultValue
 }
 
 // GetIntSliceValueImmediately 获取配置值（[]int)，立即返回，初始化未完成直接返回错误
-func (c *Config) GetIntSliceValueImmediately(key string, defaultValue []int) []int {
+func (c *Config) GetIntSliceValueImmediately(key string, defaultValue []int) (v []int) {
 	value := c.getConfigValue(key, false)
 	if value == nil {
 		return defaultValue
 	}
 
-	v, ok := value.([]int)
-	if !ok {
-		log.Debug("convert to []int fail ! source type:%T", value)
-		return defaultValue
+	switch value.(type) {
+	case []int:
+		return value.([]int)
+	case string:
+		err := json.Unmarshal([]byte(value.(string)), &v)
+		if err != nil {
+			log.Debugf("Unmarshal to []int fail ! source type:%T", value)
+			return defaultValue
+		}
+		return v
 	}
-	return v
+	log.Debugf("convert to []int fail ! source type:%T", value)
+	return defaultValue
 }
 
 // GetSliceValueImmediately 获取配置值（[]interface)，立即返回，初始化未完成直接返回错误
-func (c *Config) GetSliceValueImmediately(key string, defaultValue []interface{}) []interface{} {
+func (c *Config) GetSliceValueImmediately(key string, defaultValue []interface{}) (v []interface{}) {
 	value := c.getConfigValue(key, false)
 	if value == nil {
 		return defaultValue
 	}
 
-	v, ok := value.([]interface{})
-	if !ok {
-		log.Debug("convert to []interface{} fail ! source type:%T", value)
-		return defaultValue
+	switch value.(type) {
+	case []interface{}:
+		return value.([]interface{})
+	case string:
+		err := json.Unmarshal([]byte(value.(string)), &v)
+		if err != nil {
+			log.Debugf("Unmarshal to []interface{} fail ! source type:%T", value)
+			return defaultValue
+		}
+		return v
 	}
-	return v
+	log.Debug("convert to []interface{} fail ! source type:%T", value)
+	return defaultValue
 }
 
 // GetIntValueImmediately 获取配置值（int），获取不到则取默认值，立即返回，初始化未完成直接返回错误
@@ -213,13 +236,19 @@ func (c *Config) GetIntValueImmediately(key string, defaultValue int) int {
 	if value == nil {
 		return defaultValue
 	}
-
-	v, ok := value.(int)
-	if !ok {
-		log.Debug("convert to int fail ! source type:%T", value)
-		return defaultValue
+	switch value.(type) {
+	case int:
+		return value.(int)
+	case string:
+		v, err := strconv.Atoi(value.(string))
+		if err != nil {
+			log.Debugf("convert to int fail ! source type:%T", value)
+			return defaultValue
+		}
+		return v
 	}
-	return v
+	log.Debug("convert to int fail ! source type:%T", value)
+	return defaultValue
 }
 
 // GetFloatValueImmediately 获取配置值（float），获取不到则取默认值，立即返回，初始化未完成直接返回错误
@@ -228,28 +257,40 @@ func (c *Config) GetFloatValueImmediately(key string, defaultValue float64) floa
 	if value == nil {
 		return defaultValue
 	}
-
-	v, ok := value.(float64)
-	if !ok {
-		log.Debug("convert to float64 fail ! source type:%T", value)
-		return defaultValue
+	switch value.(type) {
+	case float64:
+		return value.(float64)
+	case string:
+		v, err := strconv.ParseFloat(value.(string), 64)
+		if err != nil {
+			log.Debug("convert to float64 fail ! source type:%T", value)
+			return defaultValue
+		}
+		return v
 	}
-	return v
+	log.Debugf("convert to float64 fail ! source type:%T", value)
+	return defaultValue
 }
 
 // GetBoolValueImmediately 获取配置值（bool），获取不到则取默认值，立即返回，初始化未完成直接返回错误
-func (c *Config) GetBoolValueImmediately(key string, defaultValue bool) bool {
+func (c *Config) GetBoolValueImmediately(key string, defaultValue bool) (v bool) {
 	value := c.getConfigValue(key, false)
 	if value == nil {
 		return defaultValue
 	}
-
-	v, ok := value.(bool)
-	if !ok {
-		log.Debug("convert to bool fail ! source type:%T", value)
-		return defaultValue
+	switch value.(type) {
+	case bool:
+		return value.(bool)
+	case string:
+		v, err := strconv.ParseBool(value.(string))
+		if err != nil {
+			log.Debugf("convert to bool fail ! source type:%T", value)
+			return defaultValue
+		}
+		return v
 	}
-	return v
+	log.Debugf("convert to bool fail ! source type:%T", value)
+	return defaultValue
 }
 
 // GetValue 获取配置值（string）
@@ -261,7 +302,7 @@ func (c *Config) GetValue(key string) string {
 
 	v, ok := value.(string)
 	if !ok {
-		log.Debug("convert to string fail ! source type:%T", value)
+		log.Debugf("convert to string fail ! source type:%T", value)
 		return utils.Empty
 	}
 	return v
@@ -278,48 +319,69 @@ func (c *Config) GetStringValue(key string, defaultValue string) string {
 }
 
 // GetStringSliceValue 获取配置值（[]string）
-func (c *Config) GetStringSliceValue(key string, defaultValue []string) []string {
+func (c *Config) GetStringSliceValue(key string, defaultValue []string) (v []string) {
 	value := c.getConfigValue(key, true)
 	if value == nil {
 		return defaultValue
 	}
 
-	v, ok := value.([]string)
-	if !ok {
-		log.Debug("convert to []string fail ! source type:%T", value)
-		return defaultValue
+	switch value.(type) {
+	case []string:
+		return value.([]string)
+	case string:
+		err := json.Unmarshal([]byte(value.(string)), &v)
+		if err != nil {
+			log.Debugf("Unmarshal to []string fail ! source type:%T", value)
+			return defaultValue
+		}
+		return v
 	}
-	return v
+	log.Debugf("convert to []string fail ! source type:%T", value)
+	return defaultValue
 }
 
 // GetIntSliceValue 获取配置值（[]int)
-func (c *Config) GetIntSliceValue(key string, defaultValue []int) []int {
+func (c *Config) GetIntSliceValue(key string, defaultValue []int) (v []int) {
 	value := c.getConfigValue(key, true)
 	if value == nil {
 		return defaultValue
 	}
 
-	v, ok := value.([]int)
-	if !ok {
-		log.Debug("convert to []int fail ! source type:%T", value)
-		return defaultValue
+	switch value.(type) {
+	case []int:
+		return value.([]int)
+	case string:
+		err := json.Unmarshal([]byte(value.(string)), &v)
+		if err != nil {
+			log.Debugf("Unmarshal to []int fail ! source type:%T", value)
+			return defaultValue
+		}
+		return v
 	}
-	return v
+	log.Debugf("convert to []int fail ! source type:%T", value)
+	return defaultValue
 }
 
 // GetSliceValue 获取配置值（[]interface)
-func (c *Config) GetSliceValue(key string, defaultValue []interface{}) []interface{} {
+func (c *Config) GetSliceValue(key string, defaultValue []interface{}) (v []interface{}) {
 	value := c.getConfigValue(key, true)
 	if value == nil {
 		return defaultValue
 	}
 
-	v, ok := value.([]interface{})
-	if !ok {
-		log.Debug("convert to []interface{} fail ! source type:%T", value)
-		return defaultValue
+	switch value.(type) {
+	case []interface{}:
+		return value.([]interface{})
+	case string:
+		err := json.Unmarshal([]byte(value.(string)), &v)
+		if err != nil {
+			log.Debugf("Unmarshal to []interface{} fail ! source type:%T", value)
+			return defaultValue
+		}
+		return v
 	}
-	return v
+	log.Debug("convert to []interface{} fail ! source type:%T", value)
+	return defaultValue
 }
 
 // GetIntValue 获取配置值（int），获取不到则取默认值
@@ -329,12 +391,19 @@ func (c *Config) GetIntValue(key string, defaultValue int) int {
 		return defaultValue
 	}
 
-	v, ok := value.(int)
-	if !ok {
-		log.Debug("convert to int fail ! source type:%T", value)
-		return defaultValue
+	switch value.(type) {
+	case int:
+		return value.(int)
+	case string:
+		v, err := strconv.Atoi(value.(string))
+		if err != nil {
+			log.Debugf("convert to int fail ! source type:%T", value)
+			return defaultValue
+		}
+		return v
 	}
-	return v
+	log.Debug("convert to int fail ! source type:%T", value)
+	return defaultValue
 }
 
 // GetFloatValue 获取配置值（float），获取不到则取默认值
@@ -343,13 +412,19 @@ func (c *Config) GetFloatValue(key string, defaultValue float64) float64 {
 	if value == nil {
 		return defaultValue
 	}
-
-	v, ok := value.(float64)
-	if !ok {
-		log.Debug("convert to float64 fail ! source type:%T", value)
-		return defaultValue
+	switch value.(type) {
+	case float64:
+		return value.(float64)
+	case string:
+		v, err := strconv.ParseFloat(value.(string), 64)
+		if err != nil {
+			log.Debug("convert to float64 fail ! source type:%T", value)
+			return defaultValue
+		}
+		return v
 	}
-	return v
+	log.Debug("convert to float64 fail ! source type:%T", value)
+	return defaultValue
 }
 
 // GetBoolValue 获取配置值（bool），获取不到则取默认值
@@ -358,13 +433,19 @@ func (c *Config) GetBoolValue(key string, defaultValue bool) bool {
 	if value == nil {
 		return defaultValue
 	}
-
-	v, ok := value.(bool)
-	if !ok {
-		log.Debug("convert to bool fail ! source type:%T", value)
-		return defaultValue
+	switch value.(type) {
+	case bool:
+		return value.(bool)
+	case string:
+		v, err := strconv.ParseBool(value.(string))
+		if err != nil {
+			log.Debug("convert to bool fail ! source type:%T", value)
+			return defaultValue
+		}
+		return v
 	}
-	return v
+	log.Debug("convert to bool fail ! source type:%T", value)
+	return defaultValue
 }
 
 // UpdateApolloConfig 根据config server返回的内容更新内存
