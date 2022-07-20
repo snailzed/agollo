@@ -60,24 +60,22 @@ var (
 )
 
 func getDefaultTransport(insecureSkipVerify bool) *http.Transport {
-	if defaultTransport == nil {
-		once.Do(func() {
-			defaultTransport = &http.Transport{
-				MaxIdleConns:        defaultMaxConnsPerHost,
-				MaxIdleConnsPerHost: defaultMaxConnsPerHost,
-				DialContext: (&net.Dialer{
-					KeepAlive: defaultKeepAliveSecond,
-					Timeout:   defaultTimeoutBySecond,
-				}).DialContext,
+	once.Do(func() {
+		defaultTransport = &http.Transport{
+			Proxy:               http.ProxyFromEnvironment,
+			MaxIdleConns:        defaultMaxConnsPerHost,
+			MaxIdleConnsPerHost: defaultMaxConnsPerHost,
+			DialContext: (&net.Dialer{
+				KeepAlive: defaultKeepAliveSecond,
+				Timeout:   defaultTimeoutBySecond,
+			}).DialContext,
+		}
+		if insecureSkipVerify {
+			defaultTransport.TLSClientConfig = &tls.Config{
+				InsecureSkipVerify: insecureSkipVerify,
 			}
-			if insecureSkipVerify {
-				defaultTransport.TLSClientConfig = &tls.Config{
-					InsecureSkipVerify: insecureSkipVerify,
-				}
-			}
-		})
-	}
-
+		}
+	})
 	return defaultTransport
 }
 
@@ -162,7 +160,7 @@ func Request(requestURL string, headers map[string]string, connectionConfig *env
 		case http.StatusOK:
 			responseBody, err := ioutil.ReadAll(res.Body)
 			if err != nil {
-				log.Errorf("Connect Apollo Server Fail,url:%s,Error:%s", requestURL, err)
+				log.Errorf("Connect Apollo Server Fail,url : %s ,Error: %s ", requestURL, err)
 				// if error then sleep
 				time.Sleep(onErrorRetryInterval)
 				continue
