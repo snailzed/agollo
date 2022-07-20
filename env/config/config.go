@@ -50,6 +50,8 @@ type AppConfig struct {
 	BackupConfigPath  string            `json:"backupConfigPath"`
 	Secret            string            `json:"secret"`
 	SyncServerTimeout int               `json:"syncServerTimeout"`
+	Label             string            `json:"label"`
+
 	// MustStart 可用于控制第一次同步必须成功
 	MustStart               bool `default:"false"`
 	notificationsMap        *notificationsMap

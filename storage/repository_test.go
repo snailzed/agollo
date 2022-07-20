@@ -30,13 +30,16 @@ import (
 	_ "github.com/snailzed/agollo/v4/agcache/memory"
 	"github.com/snailzed/agollo/v4/env"
 	_ "github.com/snailzed/agollo/v4/env/file/json"
+
+	"github.com/snailzed/agollo/v4/utils"
+
 	. "github.com/tevid/gohamcrest"
 
 	_ "github.com/snailzed/agollo/v4/utils/parse/normal"
 	_ "github.com/snailzed/agollo/v4/utils/parse/properties"
 )
 
-//init param
+// init param
 func init() {
 	extension.SetCacheFactory(&memory.DefaultCacheFactory{})
 	extension.SetFileHandler(&jsonFile.FileHandler{})
@@ -54,7 +57,6 @@ func creatTestApolloConfig(configurations map[string]interface{}, namespace stri
 		return *appConfig
 	})
 	return c
-
 }
 
 func TestUpdateApolloConfigNull(t *testing.T) {
@@ -64,9 +66,9 @@ func TestUpdateApolloConfigNull(t *testing.T) {
 
 	configurations := make(map[string]interface{})
 	configurations["string"] = "string"
-	configurations["int"] = "1"
-	configurations["float"] = "1"
-	configurations["bool"] = "true"
+	configurations["int"] = 1
+	configurations["float"] = 1.9
+	configurations["bool"] = true
 	configurations["slice"] = []int{1, 2}
 
 	apolloConfig := &config.ApolloConfig{}
@@ -87,7 +89,6 @@ func TestUpdateApolloConfigNull(t *testing.T) {
 	Assert(t, apolloConfig.Cluster, Equal(config.Cluster))
 	Assert(t, "", Equal(config.ReleaseKey))
 	Assert(t, len(apolloConfig.Configurations), Equal(5))
-
 }
 
 func TestGetDefaultNamespace(t *testing.T) {
@@ -98,9 +99,9 @@ func TestGetDefaultNamespace(t *testing.T) {
 func TestGetConfig(t *testing.T) {
 	configurations := make(map[string]interface{})
 	configurations["string"] = "string2"
-	configurations["int"] = "2"
-	configurations["float"] = "1"
-	configurations["bool"] = "false"
+	configurations["int"] = 2
+	configurations["float"] = 1.9
+	configurations["bool"] = false
 	configurations["sliceString"] = []string{"1", "2", "3"}
 	configurations["sliceInt"] = []int{1, 2, 3}
 	configurations["sliceInter"] = []interface{}{1, "2", 3}
@@ -108,42 +109,42 @@ func TestGetConfig(t *testing.T) {
 	config := c.GetConfig("test")
 	Assert(t, config, NotNilVal())
 
-	//string
+	// string
 	s := config.GetStringValue("string", "s")
 	Assert(t, s, Equal(configurations["string"]))
 
 	s = config.GetStringValue("s", "s")
 	Assert(t, s, Equal("s"))
 
-	//int
+	// int
 	i := config.GetIntValue("int", 3)
 	Assert(t, i, Equal(2))
 	i = config.GetIntValue("i", 3)
 	Assert(t, i, Equal(3))
 
-	//float
+	// float
 	f := config.GetFloatValue("float", 2)
-	Assert(t, f, Equal(float64(1)))
+	Assert(t, f, Equal(1.9))
 	f = config.GetFloatValue("f", 2)
 	Assert(t, f, Equal(float64(2)))
 
-	//bool
+	// bool
 	b := config.GetBoolValue("bool", true)
 	Assert(t, b, Equal(false))
 
 	b = config.GetBoolValue("b", false)
 	Assert(t, b, Equal(false))
 
-	slice := config.GetStringSliceValue("sliceString")
+	slice := config.GetStringSliceValue("sliceString", []string{})
 	Assert(t, slice, Equal([]string{"1", "2", "3"}))
 
-	sliceInt := config.GetIntSliceValue("sliceInt")
+	sliceInt := config.GetIntSliceValue("sliceInt", []int{})
 	Assert(t, sliceInt, Equal([]int{1, 2, 3}))
 
-	sliceInter := config.GetSliceValue("sliceInter")
+	sliceInter := config.GetSliceValue("sliceInter", []interface{}{})
 	Assert(t, sliceInter, Equal([]interface{}{1, "2", 3}))
 
-	//content
+	// content
 	content := config.GetContent()
 	hasFloat := strings.Contains(content, "float=1")
 	Assert(t, hasFloat, Equal(true))
@@ -224,4 +225,75 @@ func TestDispatchInRepository(t *testing.T) {
 	Assert(t, v, Equal("old"))
 	_, ok = l.Keys["modify"]
 	Assert(t, ok, Equal(false))
+}
+
+func TestGetValueImmediately(t *testing.T) {
+	c := initConfig("namespace", extension.GetCacheFactory())
+
+	res := c.GetValueImmediately("namespace")
+	Assert(t, res, Equal(utils.Empty))
+
+	c.isInit.Store(true)
+	res = c.GetValueImmediately("namespace")
+	Assert(t, res, Equal(utils.Empty))
+
+	res = c.GetValueImmediately("namespace1")
+	Assert(t, res, Equal(utils.Empty))
+
+	c.cache.Set("namespace", 1, 3)
+	res = c.GetValueImmediately("namespace")
+	Assert(t, res, Equal(utils.Empty))
+
+	c.cache.Set("namespace", "config", 3)
+	res = c.GetValueImmediately("namespace")
+	Assert(t, res, Equal("config"))
+}
+
+func TestGetConfigImmediately(t *testing.T) {
+	configurations := make(map[string]interface{})
+	configurations["string"] = "string2"
+	configurations["int"] = 2
+	configurations["float"] = 1.9
+	configurations["bool"] = false
+	configurations["sliceString"] = []string{"1", "2", "3"}
+	configurations["sliceInt"] = []int{1, 2, 3}
+	configurations["sliceInter"] = []interface{}{1, "2", 3}
+	c := creatTestApolloConfig(configurations, "test")
+	config := c.GetConfig("test")
+	Assert(t, config, NotNilVal())
+
+	// string
+	s := config.GetStringValueImmediately("string", "s")
+	Assert(t, s, Equal(configurations["string"]))
+
+	s = config.GetStringValueImmediately("s", "s")
+	Assert(t, s, Equal("s"))
+
+	// int
+	i := config.GetIntValueImmediately("int", 3)
+	Assert(t, i, Equal(2))
+	i = config.GetIntValueImmediately("i", 3)
+	Assert(t, i, Equal(3))
+
+	// float
+	f := config.GetFloatValueImmediately("float", 2)
+	Assert(t, f, Equal(1.9))
+	f = config.GetFloatValueImmediately("f", 2)
+	Assert(t, f, Equal(float64(2)))
+
+	// bool
+	b := config.GetBoolValueImmediately("bool", true)
+	Assert(t, b, Equal(false))
+
+	b = config.GetBoolValueImmediately("b", false)
+	Assert(t, b, Equal(false))
+
+	slice := config.GetStringSliceValueImmediately("sliceString", []string{})
+	Assert(t, slice, Equal([]string{"1", "2", "3"}))
+
+	sliceInt := config.GetIntSliceValueImmediately("sliceInt", []int{})
+	Assert(t, sliceInt, Equal([]int{1, 2, 3}))
+
+	sliceInter := config.GetSliceValueImmediately("sliceInter", []interface{}{})
+	Assert(t, sliceInter, Equal([]interface{}{1, "2", 3}))
 }
