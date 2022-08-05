@@ -71,7 +71,7 @@ type Client interface {
 	GetBoolValue(key string, defaultValue bool) bool
 	GetStringSliceValue(key string, defaultValue []string) []string
 	GetIntSliceValue(key string, defaultValue []int) []int
-	Unmarshal(key string, defaultValue interface{})
+	Unmarshal(key string, defaultValue interface{}) error
 	AddChangeListener(listener storage.ChangeListener)
 	RemoveChangeListener(listener storage.ChangeListener)
 	GetChangeListeners() *list.List
@@ -243,8 +243,8 @@ func (c *internalClient) getConfigValue(key string) interface{} {
 }
 
 //Unmarshal 反解析到defaultValue interface{}
-func (c *internalClient) Unmarshal(key string, defaultValue interface{}) {
-	c.GetConfig(storage.GetDefaultNamespace()).Unmarshal(key, defaultValue)
+func (c *internalClient) Unmarshal(key string, defaultValue interface{}) error {
+	return c.GetConfig(storage.GetDefaultNamespace()).Unmarshal(key, defaultValue)
 }
 
 // AddChangeListener 增加变更监控
