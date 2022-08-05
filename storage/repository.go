@@ -19,6 +19,7 @@ package storage
 
 import (
 	"container/list"
+	"errors"
 	"fmt"
 	"github.com/goccy/go-json"
 	"reflect"
@@ -452,52 +453,40 @@ func (c *Config) GetBoolValue(key string, defaultValue bool) bool {
 // @receiver c
 // @param key
 // @param defaultValue
-func (c *Config) Unmarshal(key string, defaultValue interface{}) {
+func (c *Config) Unmarshal(key string, defaultValue interface{}) error {
 	value := c.getConfigValue(key, true)
 	if value == nil {
-		return
+		return errors.New("empty value, see the error log")
 	}
 	switch value.(type) {
 	case string:
 		if v, ok := value.(string); ok {
-			err := json.Unmarshal([]byte(v), defaultValue)
-			if err == nil {
-				return
-			}
+			return json.Unmarshal([]byte(v), defaultValue)
 		}
 	case []byte:
-		err := json.Unmarshal(value.([]byte), defaultValue)
-		if err == nil {
-			return
-		}
+		return json.Unmarshal(value.([]byte), defaultValue)
 	}
-	log.Debug("Unmarshal fail ! source type:%T", value)
+	return fmt.Errorf("unmarshal fail ! source type:%T", value)
 }
 
 //UnmarshalImmediately 解析到defaultValue，获取不到则原样返回 立即返回，初始化未完成直接返回错误
 // @receiver c
 // @param key
 // @param defaultValue
-func (c *Config) UnmarshalImmediately(key string, defaultValue interface{}) {
+func (c *Config) UnmarshalImmediately(key string, defaultValue interface{}) error {
 	value := c.getConfigValue(key, false)
 	if value == nil {
-		return
+		return errors.New("empty value, see the error log")
 	}
 	switch value.(type) {
 	case string:
 		if v, ok := value.(string); ok {
-			err := json.Unmarshal([]byte(v), defaultValue)
-			if err == nil {
-				return
-			}
+			return json.Unmarshal([]byte(v), defaultValue)
 		}
 	case []byte:
-		err := json.Unmarshal(value.([]byte), defaultValue)
-		if err == nil {
-			return
-		}
+		return json.Unmarshal(value.([]byte), defaultValue)
 	}
-	log.Debug("Unmarshal fail ! source type:%T", value)
+	return fmt.Errorf("unmarshal fail ! source type:%T", value)
 }
 
 // UpdateApolloConfig 根据config server返回的内容更新内存
