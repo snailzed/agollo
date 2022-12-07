@@ -21,16 +21,15 @@ import (
 	"container/list"
 	"errors"
 	"fmt"
-	"github.com/goccy/go-json"
 	"reflect"
 	"strconv"
 	"sync"
 	"sync/atomic"
 
-	"github.com/snailzed/agollo/v4/env/config"
-
+	"github.com/goccy/go-json"
 	"github.com/snailzed/agollo/v4/agcache"
 	"github.com/snailzed/agollo/v4/component/log"
+	"github.com/snailzed/agollo/v4/env/config"
 	"github.com/snailzed/agollo/v4/extension"
 	"github.com/snailzed/agollo/v4/utils"
 )
@@ -67,14 +66,18 @@ func (c *Cache) GetConfig(namespace string) *Config {
 }
 
 // CreateNamespaceConfig 根据namespace初始化agollo内润配置
-func CreateNamespaceConfig(namespace string) *Cache {
+func CreateNamespaceConfig(namespace string, mustWait ...bool) *Cache {
 	// config from apollo
 	var apolloConfigCache sync.Map
 	config.SplitNamespaces(namespace, func(namespace string) {
 		if _, ok := apolloConfigCache.Load(namespace); ok {
 			return
 		}
-		c := initConfig(namespace, extension.GetCacheFactory())
+		var wait bool
+		if len(mustWait) > 0 {
+			wait = mustWait[0]
+		}
+		c := initConfig(namespace, extension.GetCacheFactory(), wait)
 		apolloConfigCache.Store(namespace, c)
 	})
 	return &Cache{
@@ -83,10 +86,11 @@ func CreateNamespaceConfig(namespace string) *Cache {
 	}
 }
 
-func initConfig(namespace string, factory agcache.CacheFactory) *Config {
+func initConfig(namespace string, factory agcache.CacheFactory, mustWait bool) *Config {
 	c := &Config{
 		namespace: namespace,
 		cache:     factory.Create(),
+		mustWait:  mustWait,
 	}
 	c.isInit.Store(false)
 	c.waitInit.Add(1)
@@ -98,6 +102,7 @@ type Config struct {
 	namespace string
 	cache     agcache.CacheInterface
 	isInit    atomic.Value
+	mustWait  bool
 	waitInit  sync.WaitGroup
 }
 
@@ -296,7 +301,7 @@ func (c *Config) GetBoolValueImmediately(key string, defaultValue bool) (v bool)
 
 // GetValue 获取配置值（string）
 func (c *Config) GetValue(key string) string {
-	value := c.getConfigValue(key, true)
+	value := c.getConfigValue(key, c.mustWait)
 	if value == nil {
 		return utils.Empty
 	}
@@ -321,7 +326,7 @@ func (c *Config) GetStringValue(key string, defaultValue string) string {
 
 // GetStringSliceValue 获取配置值（[]string）
 func (c *Config) GetStringSliceValue(key string, defaultValue []string) (v []string) {
-	value := c.getConfigValue(key, true)
+	value := c.getConfigValue(key, c.mustWait)
 	if value == nil {
 		return defaultValue
 	}
@@ -343,7 +348,7 @@ func (c *Config) GetStringSliceValue(key string, defaultValue []string) (v []str
 
 // GetIntSliceValue 获取配置值（[]int)
 func (c *Config) GetIntSliceValue(key string, defaultValue []int) (v []int) {
-	value := c.getConfigValue(key, true)
+	value := c.getConfigValue(key, c.mustWait)
 	if value == nil {
 		return defaultValue
 	}
@@ -365,7 +370,7 @@ func (c *Config) GetIntSliceValue(key string, defaultValue []int) (v []int) {
 
 // GetSliceValue 获取配置值（[]interface)
 func (c *Config) GetSliceValue(key string, defaultValue []interface{}) (v []interface{}) {
-	value := c.getConfigValue(key, true)
+	value := c.getConfigValue(key, c.mustWait)
 	if value == nil {
 		return defaultValue
 	}
@@ -387,7 +392,7 @@ func (c *Config) GetSliceValue(key string, defaultValue []interface{}) (v []inte
 
 // GetIntValue 获取配置值（int），获取不到则取默认值
 func (c *Config) GetIntValue(key string, defaultValue int) int {
-	value := c.getConfigValue(key, true)
+	value := c.getConfigValue(key, c.mustWait)
 	if value == nil {
 		return defaultValue
 	}
@@ -409,7 +414,7 @@ func (c *Config) GetIntValue(key string, defaultValue int) int {
 
 // GetFloatValue 获取配置值（float），获取不到则取默认值
 func (c *Config) GetFloatValue(key string, defaultValue float64) float64 {
-	value := c.getConfigValue(key, true)
+	value := c.getConfigValue(key, c.mustWait)
 	if value == nil {
 		return defaultValue
 	}
@@ -430,7 +435,7 @@ func (c *Config) GetFloatValue(key string, defaultValue float64) float64 {
 
 // GetBoolValue 获取配置值（bool），获取不到则取默认值
 func (c *Config) GetBoolValue(key string, defaultValue bool) bool {
-	value := c.getConfigValue(key, true)
+	value := c.getConfigValue(key, c.mustWait)
 	if value == nil {
 		return defaultValue
 	}
@@ -454,7 +459,7 @@ func (c *Config) GetBoolValue(key string, defaultValue bool) bool {
 // @param key
 // @param defaultValue
 func (c *Config) Unmarshal(key string, defaultValue interface{}) error {
-	value := c.getConfigValue(key, true)
+	value := c.getConfigValue(key, c.mustWait)
 	if value == nil {
 		return errors.New("empty value, see the error log")
 	}
@@ -502,7 +507,7 @@ func (c *Cache) UpdateApolloConfig(apolloConfig *config.ApolloConfig, appConfigF
 	appConfig.SetCurrentApolloConfig(&apolloConfig.ApolloConnConfig)
 
 	// get change list
-	changeList := c.UpdateApolloConfigCache(apolloConfig.Configurations, configCacheExpireTime, apolloConfig.NamespaceName)
+	changeList := c.UpdateApolloConfigCache(apolloConfig.Configurations, configCacheExpireTime, apolloConfig.NamespaceName, appConfig)
 
 	notify := appConfig.GetNotificationsMap().GetNotify(apolloConfig.NamespaceName)
 
@@ -525,10 +530,10 @@ func (c *Cache) UpdateApolloConfig(apolloConfig *config.ApolloConfig, appConfigF
 }
 
 // UpdateApolloConfigCache 根据conf[ig server返回的内容更新内存
-func (c *Cache) UpdateApolloConfigCache(configurations map[string]interface{}, expireTime int, namespace string) map[string]*ConfigChange {
+func (c *Cache) UpdateApolloConfigCache(configurations map[string]interface{}, expireTime int, namespace string, appConfig config.AppConfig) map[string]*ConfigChange {
 	config := c.GetConfig(namespace)
 	if config == nil {
-		config = initConfig(namespace, extension.GetCacheFactory())
+		config = initConfig(namespace, extension.GetCacheFactory(), appConfig.MustStart)
 		c.apolloConfigCache.Store(namespace, config)
 	}
 
@@ -546,6 +551,10 @@ func (c *Cache) UpdateApolloConfigCache(configurations map[string]interface{}, e
 	}(config)
 
 	if (configurations == nil || len(configurations) == 0) && config.cache.EntryCount() == 0 {
+		//当无配置项时，也属于加载配置完成
+		if configurations != nil {
+			isInit = true
+		}
 		return nil
 	}
 

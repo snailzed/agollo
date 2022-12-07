@@ -20,6 +20,7 @@ package agollo
 import (
 	"container/list"
 	"errors"
+
 	"github.com/snailzed/agollo/v4/agcache"
 	"github.com/snailzed/agollo/v4/agcache/memory"
 	"github.com/snailzed/agollo/v4/cluster/roundrobin"
@@ -114,7 +115,7 @@ func StartWithConfig(loadAppConfig func() (*config.AppConfig, error)) (Client, e
 		c.appConfig = appConfig
 	}
 
-	c.cache = storage.CreateNamespaceConfig(appConfig.NamespaceName)
+	c.cache = storage.CreateNamespaceConfig(appConfig.NamespaceName, appConfig.MustStart)
 	appConfig.Init()
 
 	serverlist.InitSyncServerIPList(c.getAppConfig)
@@ -157,7 +158,7 @@ func (c *internalClient) GetConfigAndInit(namespace string) *storage.Config {
 
 	if config == nil {
 		//init cache
-		storage.CreateNamespaceConfig(namespace)
+		storage.CreateNamespaceConfig(namespace, c.getAppConfig().MustStart)
 
 		//sync config
 		syncApolloConfig.SyncWithNamespace(namespace, c.getAppConfig)

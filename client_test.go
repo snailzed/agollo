@@ -60,7 +60,7 @@ func createMockApolloConfig(expireTime int) *internalClient {
 	//int slice
 	configs["intSlice"] = []int{1, 2}
 
-	client.cache.UpdateApolloConfigCache(configs, expireTime, storage.GetDefaultNamespace())
+	client.cache.UpdateApolloConfigCache(configs, expireTime, storage.GetDefaultNamespace(), *client.appConfig)
 
 	return client
 }
