@@ -138,7 +138,7 @@ func (c *Config) getConfigValue(key string, waitInit bool) interface{} {
 
 	value, err := c.cache.Get(key)
 	if err != nil {
-		log.Errorf("get config value fail!key:%s,err:%s", key, err)
+		log.Warnf("get config value fail!key:%s,err:%s", key, err)
 		return nil
 	}
 
@@ -454,7 +454,7 @@ func (c *Config) GetBoolValue(key string, defaultValue bool) bool {
 	return defaultValue
 }
 
-//Unmarshal 解析到defaultValue，获取不到则原样返回
+// Unmarshal 解析到defaultValue，获取不到则原样返回
 // @receiver c
 // @param key
 // @param defaultValue
@@ -474,7 +474,7 @@ func (c *Config) Unmarshal(key string, defaultValue interface{}) error {
 	return fmt.Errorf("unmarshal fail ! source type:%T", value)
 }
 
-//UnmarshalImmediately 解析到defaultValue，获取不到则原样返回 立即返回，初始化未完成直接返回错误
+// UnmarshalImmediately 解析到defaultValue，获取不到则原样返回 立即返回，初始化未完成直接返回错误
 // @receiver c
 // @param key
 // @param defaultValue
