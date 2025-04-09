@@ -138,7 +138,7 @@ func (c *Config) getConfigValue(key string, waitInit bool) interface{} {
 
 	value, err := c.cache.Get(key)
 	if err != nil {
-		log.Warnf("get config value fail!key:%s,err:%s", key, err)
+		log.Debugf("get config value fail!key:%s,err:%s", key, err)
 		return nil
 	}
 
